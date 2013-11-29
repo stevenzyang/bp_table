@@ -41,9 +41,9 @@ class BPTable:
         if self.on_init() == False:
             self._running = False
 class Cups:
-    c_pos1 = [(20, 230),(20, 275), (20, 318), (20, 361), (65, 255), 
+    c_pos1 = [(20, 230),(20, 275), (20, 318), (20, 361), (65, 255),
         (65, 298), (65, 340), (110, 273), (110, 317), (150, 294)]
-    c_pos2 = [(780, 230),(780, 275), (780, 318), (780, 361), (735, 255), 
+    c_pos2 = [(780, 230),(780, 275), (780, 318), (780, 361), (735, 255),
         (735, 298), (735, 340), (690, 273), (690, 317), (650, 294)]
     c_r = 20
     c_color = (0, 0, 0)
@@ -73,12 +73,15 @@ class Cups:
 
         pygame.display.update()
 
+def setup_scoreboard():
+    pygame.font.init()
+    score_font = pygame.font.Font(None, 50)
+    player1 = score_font.render("Team 1: " , 1, (255, 255, 255))
+    screen.blit(player1, (100, 70))
+    player2 = score_font.render("Team 2: ", 1, (255, 255, 255))
+    screen.blit(player2, (550, 70))
 
-if __name__ == "__main__":
-    bp = BPTable()
-    cup_setup = Cups()
-    cup_setup.setup_cups()
-    bp.on_execute()
+def start_game():
     while 1:
         curr_player1 = player1.readline()
         print(curr_player1)
@@ -87,7 +90,7 @@ if __name__ == "__main__":
         # is on or off
         if curr_player1 == "1\r\n":
             pos = Cups.c_pos1[0]
-            c_color = (255, 0, 0)
+            c_color = (181, 6, 6)
             pygame.draw.circle(screen, c_color, pos, 20)
         elif curr_player1 == "2\r\n":
             pos = Cups.c_pos1[0]
@@ -97,3 +100,11 @@ if __name__ == "__main__":
         for event in pygame.event.get():
             bp.on_event(event)
         pygame.display.update()
+
+if __name__ == "__main__":
+    bp = BPTable()
+    cup_setup = Cups()
+    cup_setup.setup_cups()
+    setup_scoreboard()
+    bp.on_execute()
+    start_game()
