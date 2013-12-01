@@ -11,13 +11,18 @@ __author__ = {'name' : '[Theta Tau] Lambda Class',
               'Version' : '1.0'}
 
 # Serialization for each arduino
-player1 = serial.Serial('/dev/tty.usbmodem1411', 9600)
+player1 = serial.Serial('/dev/tty.usbmodem1411', 9600, timeout=5)
+player2 = serial.Serial('/dev/tty.usbmodem1421', 9600, timeout=5)
 
 # Screen Setup
 screen = pygame.display.set_mode((800,600), 0, 32)
 image_surf = pygame.image.load("thetatau.bmp").convert()
 screen.blit(image_surf,(0, 0))
 pygame.display.flip()
+
+#Game variables
+p1_score = 0
+p2_score = 0
 
 class BPTable:
     def __init__(self):
@@ -49,57 +54,96 @@ class Cups:
     c_color = (0, 0, 0)
 
     def setup_cups(self):
-        pygame.draw.circle(screen, self.c_color, self.c_pos1[0], self.c_r)
-        pygame.draw.circle(screen, self.c_color, self.c_pos1[1], self.c_r)
-        pygame.draw.circle(screen, self.c_color, self.c_pos1[2], self.c_r)
-        pygame.draw.circle(screen, self.c_color, self.c_pos1[3], self.c_r)
-        pygame.draw.circle(screen, self.c_color, self.c_pos1[4], self.c_r)
-        pygame.draw.circle(screen, self.c_color, self.c_pos1[5], self.c_r)
-        pygame.draw.circle(screen, self.c_color, self.c_pos1[6], self.c_r)
-        pygame.draw.circle(screen, self.c_color, self.c_pos1[7], self.c_r)
-        pygame.draw.circle(screen, self.c_color, self.c_pos1[8], self.c_r)
-        pygame.draw.circle(screen, self.c_color, self.c_pos1[9], self.c_r)
-
-        pygame.draw.circle(screen, self.c_color, self.c_pos2[0], self.c_r)
-        pygame.draw.circle(screen, self.c_color, self.c_pos2[1], self.c_r)
-        pygame.draw.circle(screen, self.c_color, self.c_pos2[2], self.c_r)
-        pygame.draw.circle(screen, self.c_color, self.c_pos2[3], self.c_r)
-        pygame.draw.circle(screen, self.c_color, self.c_pos2[4], self.c_r)
-        pygame.draw.circle(screen, self.c_color, self.c_pos2[5], self.c_r)
-        pygame.draw.circle(screen, self.c_color, self.c_pos2[6], self.c_r)
-        pygame.draw.circle(screen, self.c_color, self.c_pos2[7], self.c_r)
-        pygame.draw.circle(screen, self.c_color, self.c_pos2[8], self.c_r)
-        pygame.draw.circle(screen, self.c_color, self.c_pos2[9], self.c_r)
-
+        for i in range (0, 10):
+            pygame.draw.circle(screen, self.c_color, self.c_pos1[i], self.c_r)
+        for i in range (0, 10):
+            pygame.draw.circle(screen, self.c_color, self.c_pos2[i], self.c_r)
         pygame.display.update()
 
 def setup_scoreboard():
     pygame.font.init()
     score_font = pygame.font.Font(None, 50)
-    player1 = score_font.render("Team 1: " , 1, (255, 255, 255))
-    screen.blit(player1, (100, 70))
-    player2 = score_font.render("Team 2: ", 1, (255, 255, 255))
-    screen.blit(player2, (550, 70))
+    player1 = score_font.render("Team Tongs: " , 1, (255, 255, 255))
+    screen.blit(player1, (10, 70))
+    player2 = score_font.render("Team Hammerd: ", 1, (255, 255, 255))
+    screen.blit(player2, (480, 70))
+
+def score_player1(score):
+    s = pygame.Surface((80,40))
+    screen.blit(s, (224, 60))
+    score_font = pygame.font.Font(None, 50)
+    current = score_font.render(str(score), 1, (255, 255, 255))
+    screen.blit(current, (240, 70))
+
+def score_player2(score):
+    s = pygame.Surface((80,40))
+    screen.blit(s, (765, 60))
+    score_font = pygame.font.Font(None, 50)
+    current = score_font.render(str(score), 1, (255, 255, 255))
+    screen.blit(current, (770, 70))
+
+def player1_take_turn():
+    global p1_score
+    curr_player1 = player1.readline()
+    print(curr_player1)
+    # i +"\r\n" is the output from serialization of arduino; we can control what
+    # outputs come from arduino, therefore controlling whether or not something
+    # is on or off
+    for i in range(1, 21):
+        check = str(i) + "\r\n"
+        if curr_player1 == check:
+            if i % 2 != 0:
+                player1_draw_cup((i-1)/2, True)
+                p1_score += 1
+            else:
+                player1_draw_cup((i-1)/2, False)
+
+def player1_draw_cup(position, lit):
+    if lit:
+        pygame.draw.circle(screen, (230, 175, 6),Cups.c_pos1[position], 20)
+    else:
+        pygame.draw.circle(screen, (0, 0, 0),Cups.c_pos1[position], 20)
+
+def player2_take_turn():
+    global p2_score
+    curr_player2 = player2.readline()
+    print(curr_player2)
+    # i +"\r\n" is the output from serialization of arduino; we can control what
+    # outputs come from arduino, therefore controlling whether or not something
+    # is on or off
+    for i in range(1, 21):
+        check = str(i) + "\r\n"
+        if curr_player2 == check:
+            if i % 2 != 0:
+                player2_draw_cup((i-1)/2, True)
+                p1_score += 1
+            else:
+                player2_draw_cup((i-1)/2, False)
+
+def player2_draw_cup(position, lit):
+    if lit:
+        pygame.draw.circle(screen, (181, 6, 6),Cups.c_pos2[position], 20)
+    else:
+        pygame.draw.circle(screen, (0, 0, 0),Cups.c_pos2[position], 20)
 
 def start_game():
+    global p1_score
+    global p2_score
+    time.sleep(2)
     while 1:
-        curr_player1 = player1.readline()
-        print(curr_player1)
-        # "1\r\n" is the output from serialization of arduino; we can control what
-        # outputs come from arduino, therefore controlling whether or not something
-        # is on or off
-        if curr_player1 == "1\r\n":
-            pos = Cups.c_pos1[0]
-            c_color = (181, 6, 6)
-            pygame.draw.circle(screen, c_color, pos, 20)
-        elif curr_player1 == "2\r\n":
-            pos = Cups.c_pos1[0]
-            c_color = (0, 0, 0)
-            pygame.draw.circle(screen, c_color, pos, 20)
+        p1_score = 0
+        p2_score = 0
+        for i in range(0, 10):
+            player1_take_turn()
+            player2_take_turn()
+        score_player1(p1_score)
         # You need this loop here in order for pygame to run properly
         for event in pygame.event.get():
             bp.on_event(event)
         pygame.display.update()
+        player1.flushInput()
+        player2.flushInput()
+        time.sleep(.5)
 
 if __name__ == "__main__":
     bp = BPTable()
