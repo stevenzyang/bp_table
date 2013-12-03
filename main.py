@@ -11,8 +11,8 @@ __author__ = {'name' : '[Theta Tau] Lambda Class',
               'Version' : '1.0'}
 
 # Serialization for each arduino
-player1 = serial.Serial('/dev/tty.usbmodem1411', 9600, timeout=5)
-player2 = serial.Serial('/dev/tty.usbmodem1421', 9600, timeout=5)
+player1 = serial.Serial('/dev/ttyACM0', 9600, timeout=5)
+player2 = serial.Serial('/dev/ttyACM1', 9600, timeout=5)
 
 # Screen Setup
 screen = pygame.display.set_mode((800,600), 0, 32)
@@ -31,6 +31,7 @@ class BPTable:
 
     def on_init(self):
         pygame.init()
+	'''pygame.display.toggle_fullscreen()'''
         self._running = True
     def on_event(self, event):
         if event.type == pygame.QUIT:
@@ -66,7 +67,7 @@ def setup_scoreboard():
     player1 = score_font.render("Team Tongs: " , 1, (255, 255, 255))
     screen.blit(player1, (10, 70))
     player2 = score_font.render("Team Hammerd: ", 1, (255, 255, 255))
-    screen.blit(player2, (480, 70))
+    screen.blit(player2, (470, 70))
 
 def score_player1(score):
     s = pygame.Surface((80,40))
@@ -80,7 +81,7 @@ def score_player2(score):
     screen.blit(s, (765, 60))
     score_font = pygame.font.Font(None, 50)
     current = score_font.render(str(score), 1, (255, 255, 255))
-    screen.blit(current, (770, 70))
+    screen.blit(current, (755, 70))
 
 def player1_take_turn():
     global p1_score
@@ -116,7 +117,7 @@ def player2_take_turn():
         if curr_player2 == check:
             if i % 2 != 0:
                 player2_draw_cup((i-1)/2, True)
-                p1_score += 1
+                p2_score += 1
             else:
                 player2_draw_cup((i-1)/2, False)
 
@@ -137,6 +138,7 @@ def start_game():
             player1_take_turn()
             player2_take_turn()
         score_player1(p1_score)
+	score_player2(p2_score)
         # You need this loop here in order for pygame to run properly
         for event in pygame.event.get():
             bp.on_event(event)
