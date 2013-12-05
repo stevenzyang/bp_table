@@ -11,8 +11,8 @@ __author__ = {'name' : '[Theta Tau] Lambda Class',
               'Version' : '1.0'}
 
 # Serialization for each arduino
-player1 = serial.Serial('/dev/ttyACM0', 9600, timeout=5)
-player2 = serial.Serial('/dev/ttyACM1', 9600, timeout=5)
+player1 = serial.Serial('/dev/tty.usbmodem1411', 9600, timeout=5)
+player2 = serial.Serial('/dev/tty.usbmodem1421', 9600, timeout=5)
 
 # Screen Setup
 screen = pygame.display.set_mode((800,600), 0, 32)
@@ -66,8 +66,8 @@ def setup_scoreboard():
     score_font = pygame.font.Font(None, 50)
     player1 = score_font.render("Team Tongs: " , 1, (255, 255, 255))
     screen.blit(player1, (10, 70))
-    player2 = score_font.render("Team Hammerd: ", 1, (255, 255, 255))
-    screen.blit(player2, (470, 70))
+    player2 = score_font.render("Team Hammered: ", 1, (255, 255, 255))
+    screen.blit(player2, (460, 70))
 
 def score_player1(score):
     s = pygame.Surface((80,40))
@@ -78,7 +78,7 @@ def score_player1(score):
 
 def score_player2(score):
     s = pygame.Surface((80,40))
-    screen.blit(s, (765, 60))
+    screen.blit(s, (755, 60))
     score_font = pygame.font.Font(None, 50)
     current = score_font.render(str(score), 1, (255, 255, 255))
     screen.blit(current, (755, 70))
